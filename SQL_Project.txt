@@ -1,0 +1,57 @@
+Business Question One:  
+Find the employees who met the sales target of at least 100000, for the year 2008. 
+
+
+/*Query to find sales persons information */
+
+WITH Sales_Person AS (SELECT first_name, last_name, employee_ID 
+                      FROM HR.Employees 
+                      WHERE Department_ID =80),
+
+/*Query to find sales amounts for year 2007 that were >= 250000 */
+
+Sales AS (SELECT SUM (quantity * unit_price) as Total_Sales, Sales_Rep_ID 
+          FROM OE.Orders o
+          JOIN OE.Order_Items i
+          USING (order_id)
+          GROUP BY Sales_Rep_ID, EXTRACT(YEAR FROM order_date)
+          HAVING SUM (quantity * unit_price) >= 100000
+          AND EXTRACT (YEAR FROM order_date) = 2008 
+          AND Sales_Rep_ID IS NOT NULL)
+          
+/*Join the two CTE's above */  
+
+SELECT P.*, S.* 
+FROM Sales_Person P
+JOIN Sales S
+ON sales_Rep_ID = employee_ID
+
+
+
+
+Business Question Two:  
+Querying the bottom 5 (least profitable products) that were launched into the market on or after '01-JAN-98'
+
+/*Finding net profit per product_id */
+
+WITH Profit AS(
+SELECT Prod_ID, SUM(Amount_Sold-Total_Cost) AS Net_Profit
+FROM SH.Profits
+GROUP BY  Prod_ID  
+ORDER BY Prod_ID ASC),
+
+/*Getting the rest of the data that is relevant to this analysis */
+
+Product AS(SELECT Prod_ID, Prod_Name, Prod_Category, Prod_Subcategory, Prod_Min_Price, Prod_Eff_From
+           FROM SH.Products)
+
+/* Joining the two CTE's above and further filtering the data to show :
+the net profit of the bottom 5 selling products, that were lauched into the market after '01-JAN-98' */
+
+SELECT P.*,PP.* 
+FROM Profit P
+JOIN Product PP
+ON PP.Prod_ID = P.Prod_ID
+WHERE Prod_Eff_From >= TO_DATE('01-JAN-98', 'DD-MONTH-YYYY')
+ORDER BY Net_Profit ASC
+FETCH NEXT 5 ROWS ONLY
