@@ -2,35 +2,49 @@ Business Question One:
 Find the employees who met the sales target of at least 100000, for the year 2008. 
 
 
-/*Query to find sales persons information */
+/*Exploring the data*/
 
-WITH Sales_Person AS (SELECT first_name, last_name, employee_ID 
+SELECT * FROM HR.Employees
+SELECT * FROM OE.Orders 
+SELECT * FROM OE.Order_items
+
+/*Querying sales persons information */
+
+WITH sales_person AS (SELECT First_Name, Last_Name, Employee_ID, Hire_Date 
                       FROM HR.Employees 
                       WHERE Department_ID =80),
 
-/*Query to find sales amounts for year 2007 that were >= 250000 */
+/*Querying sales amounts for year 2007 that were >= 250000 */
 
-Sales AS (SELECT SUM (quantity * unit_price) as Total_Sales, Sales_Rep_ID 
+sales AS (SELECT SUM (Quantity * Unit_Price) as Total_Sales, Sales_Rep_ID 
           FROM OE.Orders o
           JOIN OE.Order_Items i
-          USING (order_id)
-          GROUP BY Sales_Rep_ID, EXTRACT(YEAR FROM order_date)
-          HAVING SUM (quantity * unit_price) >= 100000
-          AND EXTRACT (YEAR FROM order_date) = 2008 
+          USING (Order_ID)
+          GROUP BY Sales_Rep_ID, EXTRACT(YEAR FROM Order_Date)
+          HAVING SUM (Quantity * Unit_Price) >= 100000
+          AND EXTRACT (YEAR FROM Order_Date) = 2008 
           AND Sales_Rep_ID IS NOT NULL)
           
-/*Join the two CTE's above */  
+/*Join the two CTE's above */
 
 SELECT P.*, S.* 
 FROM Sales_Person P
 JOIN Sales S
-ON sales_Rep_ID = employee_ID
+ON Sales_Rep_ID = Employee_ID
+
+
 
 
 
 
 Business Question Two:  
 Find the bottom 5 (least profitable products) that were launched into the market on or after '01-JAN-98'.
+
+
+/*Exploring the data*/
+
+SELECT * FROM SH.Products
+SELECT * FROM SH.Profits
 
 /*Query to find the net profit per product_id */
 
