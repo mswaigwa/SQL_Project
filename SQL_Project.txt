@@ -30,9 +30,9 @@ ON sales_Rep_ID = employee_ID
 
 
 Business Question Two:  
-Querying the bottom 5 (least profitable products) that were launched into the market on or after '01-JAN-98'
+Find the bottom 5 (least profitable products) that were launched into the market on or after '01-JAN-98'.
 
-/*Finding net profit per product_id */
+/*Query to find the net profit per product_id */
 
 WITH Profit AS(
 SELECT Prod_ID, SUM(Amount_Sold-Total_Cost) AS Net_Profit
@@ -40,7 +40,7 @@ FROM SH.Profits
 GROUP BY  Prod_ID  
 ORDER BY Prod_ID ASC),
 
-/*Getting the rest of the data that is relevant to this analysis */
+/*Selecting the rest of the columns that are relevant to this analysis */
 
 Product AS(SELECT Prod_ID, Prod_Name, Prod_Category, Prod_Subcategory, Prod_Min_Price, Prod_Eff_From
            FROM SH.Products)
